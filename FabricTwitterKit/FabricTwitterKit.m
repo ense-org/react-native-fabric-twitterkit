@@ -219,18 +219,12 @@ RCT_EXPORT_METHOD(composeTweet:(NSDictionary *)options :(RCTResponseSenderBlock)
     
     UIViewController *rootView = [UIApplication sharedApplication].keyWindow.rootViewController;
     [composer showFromViewController:rootView completion:^(TWTRComposerResult result) {
-        
-        bool completed = NO, cancelled = NO, error = NO;
-        
         if (result == TWTRComposerResultCancelled) {
-            cancelled = YES;
+            callback(@[@"cancelled", [NSNull null]]);
         }
         else {
-            completed = YES;
+            callback(@[[NSNull null], @"completed"]);
         }
-        
-        callback(@[@(completed), @(cancelled), @(error)]);
-        
     }];
 }
 
