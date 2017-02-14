@@ -203,11 +203,18 @@ RCT_EXPORT_METHOD(fetchTweet:(NSDictionary *)options :(RCTResponseSenderBlock)ca
 RCT_EXPORT_METHOD(composeTweet:(NSDictionary *)options :(RCTResponseSenderBlock)callback) {
     
     NSString *body = options[@"body"];
+    NSString *url = options[@"url"];
     
     TWTRComposer *composer = [[TWTRComposer alloc] init];
     
     if (body) {
         [composer setText:body];
+    }
+    if (url) {
+        NSURL *link = [[NSURL alloc] initWithString:url];
+        if (link) {
+            [composer setURL:link];
+        }
     }
     
     UIViewController *rootView = [UIApplication sharedApplication].keyWindow.rootViewController;
