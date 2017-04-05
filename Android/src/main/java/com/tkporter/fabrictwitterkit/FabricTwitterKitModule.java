@@ -29,6 +29,9 @@ import com.twitter.sdk.android.core.TwitterApiClient;
 import com.twitter.sdk.android.core.models.Tweet;
 import com.twitter.sdk.android.core.models.User;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.http.GET;
@@ -83,17 +86,20 @@ public class FabricTwitterKitModule extends ReactContextBaseJavaModule implement
     }
 
     @ReactMethod
-    public void composeTweet(ReadableMap options, final Callback callback) {
+    public void composeTweet(ReadableMap options, final Callback callback) throws MalformedURLException {
         try {
             this.callback = callback;
 
             String body = options.hasKey("body") ? options.getString("body") : "";
+            String urlString = options.hasKey("url") ? options.getString("url") : "";
+            URL url = new URL(urlString);
 
-            TweetComposer.Builder builder = new TweetComposer.Builder(reactContext).text(body);
+
+            TweetComposer.Builder builder = new TweetComposer.Builder(reactContext).text(body).url(url);
             final Intent intent = builder.createIntent();
             reactContext.startActivityForResult(intent, REQUEST_CODE, intent.getExtras());
 
-        } catch (Exception e) {
+        } catch (MalformedURLException e) {
             //error!
             sendCallback(false, false, true);
             throw e;
