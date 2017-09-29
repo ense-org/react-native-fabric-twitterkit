@@ -18,6 +18,8 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.google.gson.Gson;
 
+import com.twitter.sdk.android.core.OAuthSigning;
+import com.twitter.sdk.android.core.internal.TwitterApi;
 import com.twitter.sdk.android.tweetcomposer.TweetComposer;
 import com.twitter.sdk.android.core.services.StatusesService;
 import com.twitter.sdk.android.core.Result;
@@ -192,6 +194,34 @@ public class FabricTwitterKitModule extends ReactContextBaseJavaModule implement
     @ReactMethod
     public void logOut() {
         TwitterCore.getInstance().logOut();
+    }
+
+    @ReactMethod
+    public void getOAuthHeaders(final Callback callback) {
+        TwitterSession session = TwitterCore.getInstance().getSessionManager().getActiveSession();
+        OAuthSigning signing = new OAuthSigning(TwitterCore.getInstance().getAuthConfig(), session.getAuthToken());
+        callback.invoke(null, signing.getOAuthEchoHeadersForVerifyCredentials());
+    }
+
+    @ReactMethod
+    public void sessionDetails(final Callback callback) {
+        TwitterSession sessionResult = TwitterCore.getInstance().getSessionManager().getActiveSession();
+        if(sessionResult != null) {
+            WritableMap result = new WritableNativeMap();
+            result.putString("authToken", sessionResult.getAuthToken().token);
+            result.putString("authTokenSecret",sessionResult.getAuthToken().secret);
+            result.putString("userID", sessionResult.getUserId()+"");
+            result.putString("userName", sessionResult.getUserName());
+            callback.invoke(null, result);
+        } else {
+            callback.invoke(null, null);
+        }
+    }
+
+    @ReactMethod
+    public void sendTwitterRequest(ReadableMap options, final Callback callback) {
+        //TODO
+
     }
 
     private boolean hasValidKey(String key, ReadableMap options) {
